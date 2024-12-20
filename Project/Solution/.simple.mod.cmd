@@ -1,0 +1,1 @@
+cmd_/home/ubuntu/Desktop/RTOS/Driver_Exercises/Driver_exercises/Solution/simple.mod := { echo  /home/ubuntu/Desktop/RTOS/Driver_Exercises/Driver_exercises/Solution/simple.o;  echo; } > /home/ubuntu/Desktop/RTOS/Driver_Exercises/Driver_exercises/Solution/simple.mod

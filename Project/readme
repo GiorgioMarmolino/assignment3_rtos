@@ -1,0 +1,11 @@
+Please start with the first exercise, whose solution is in the folder Solution. 
+
+Notice that the first exercise requires to properly fill the driver with all the required functions, and then to compile and load it as required (the full procedure is in the readme of the folder Solution).
+
+Then it is necessary to properly fill the files read.c and write.c. By running write and, after that, read it will be possible to exchange data by using kernel memory. 
+
+All the instructions to fill the file read.c write.c and simple.c are in the files themselves. As usual we suggest to keep the solutions open in a separate window, and copy/paste from the solution files by paying care to understand what you are doing.
+
+Have fun!
+
+

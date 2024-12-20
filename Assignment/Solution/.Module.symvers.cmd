@@ -1,0 +1,1 @@
+cmd_/home/ubuntu/Desktop/RTOS/Driver_Exercises/Driver_exercises/Solution/Module.symvers := sed 's/\.ko$$/\.o/' /home/ubuntu/Desktop/RTOS/Driver_Exercises/Driver_exercises/Solution/modules.order | scripts/mod/modpost -m -a  -o /home/ubuntu/Desktop/RTOS/Driver_Exercises/Driver_exercises/Solution/Module.symvers -e -i Module.symvers   -T -
