@@ -1,1 +1,0 @@
-cmd_/home/marea/Desktop/driver/Solution/simple.ko := ld -r -m elf_x86_64 -T ./scripts/module-common.lds --build-id  -o /home/marea/Desktop/driver/Solution/simple.ko /home/marea/Desktop/driver/Solution/simple.o /home/marea/Desktop/driver/Solution/simple.mod.o

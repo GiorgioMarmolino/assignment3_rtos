@@ -1,1 +1,0 @@
-cmd_/home/ubuntu/Desktop/RTOS/Assignment/simple.ko := ld -r -EL  -maarch64elf -z noexecstack --build-id=sha1  -T scripts/module.lds -o /home/ubuntu/Desktop/RTOS/Assignment/simple.ko /home/ubuntu/Desktop/RTOS/Assignment/simple.o /home/ubuntu/Desktop/RTOS/Assignment/simple.mod.o;  true

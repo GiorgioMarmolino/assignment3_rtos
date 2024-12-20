@@ -1,1 +1,0 @@
-cmd_/home/ubuntu/Desktop/RTOS/Assignment/Module.symvers := sed 's/\.ko$$/\.o/' /home/ubuntu/Desktop/RTOS/Assignment/modules.order | scripts/mod/modpost -m -a  -o /home/ubuntu/Desktop/RTOS/Assignment/Module.symvers -e -i Module.symvers   -T -
