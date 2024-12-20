@@ -1,0 +1,7 @@
+ This example creates a driver which is able to handle two different areas of memory, and implements two sets of file operations to read from/write to the different areas. For doing so, the driver uses two minor numbers.
+
+Try to understand by yourself how to use this driver from user space to access the two different areas of memory!
+
+Best,
+
+Antonio

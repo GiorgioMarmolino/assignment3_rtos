@@ -1,0 +1,12 @@
+This example works as the previous one if the open in read-final.c is called with the flag O_NONBLOCKING. However, if the flag O_NONBLOCKING is not set, a blocking behaviour should be noticed. 
+
+It is not possible to call 
+
+	./read
+
+before
+
+	./write
+
+as the former will block until some data are available to be read.
+
