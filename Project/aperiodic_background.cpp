@@ -13,12 +13,6 @@ int write_ID_driver(char* str){
 	int fd, result, len;
 	char buf[10];
 
-	//Please check the read function. The read and the write
-		//must access the same device /dev/simple or /dev/simple0
-		//in order to correctly exchange information
-
-	//if ((fd = open ("/dev/simple1", O_RDWR)) == -1) {
-
 	if ((fd = open ("/dev/simple", O_RDWR)) == -1) {
 				perror("open failed");
 				return -1;
@@ -182,44 +176,23 @@ int main()
   	exit(0);
 }
 
-// application specific task_2 code
-void task2_code()
-{
-	//print the id of the current task
-  	printf(" 2[ "); fflush(stdout);
 
-	//this double loop with random computation is only required to waste time
-	int i,j;
+void task2_code(){
+	write_ID_driver("[2");
 	double uno;
-  	for (i = 0; i < OUTERLOOP; i++)
-    	{
-      		for (j = 0; j < INNERLOOP; j++)
-			{
-				uno = rand()*rand()%10;
-    		}
+  	for (i = 0; i < OUTERLOOP; i++){
+		for (j = 0; j < INNERLOOP; j++) uno = rand()*rand()%10;		
   	}
-
-  	// when the random variable uno=0, then aperiodic task 4 must
-  	// be executed
-  	if (uno == 0)
-    	{
-      		printf(":ex(4)");fflush(stdout);
-	// In theory, we should protect conditions using mutexes. However, in a real-time application, something undesirable may happen.
-	// Indeed, when task2 takes the mutex and sends the condition, task4 is executed and is given the mutex by the kernel. Which means
-	// that task2 (higher priority) would be blocked waiting for task4 to finish (lower priority). This is of course unacceptable,
-	// as it would produced a priority inversion. For this reason, we are not putting mutexes here. A better solution should be found.
-
-//      		pthread_mutex_lock(&mutex_task_4);
-      		pthread_cond_signal(&cond_task_4);
-//      		pthread_mutex_unlock(&mutex_task_4);
+  	
+  	if (uno == 0){//execute ap. task4 when uno==0
+		printf(":ex(4)");fflush(stdout);
+//     	pthread_mutex_lock(&mutex_task_4);
+		pthread_cond_signal(&cond_task_4);
+//      pthread_mutex_unlock(&mutex_task_4);
 	}
-
-  	//print the id of the current task
-  	printf(" ]2 "); fflush(stdout);
+  	write_ID_driver("2]");
 }
-//thread code for task_1 (used only for temporization)
-void *task2( void *ptr)
-{
+void *task2( void *ptr){
 	// set thread affinity, that is the processor on which threads shall run
 	cpu_set_t cset;
 	CPU_ZERO (&cset);
@@ -227,118 +200,80 @@ void *task2( void *ptr)
 	pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cset);
 
    	//execute the task one hundred times... it should be an infinite loop (too dangerous)
-  	int i=0;
-  	for (i=0; i < 100; i++)
-    	{
-      		// execute application specific code
-			task2_code();
+  	for (i=0; i < 100; i++){
+		task2_code();
+		// it would be nice to check if we missed a deadline here... why don't you try by yourself?
 
-		// it would be nice to check if we missed a deadline here... why don't
-		// you try by yourself?
-
-		// sleep until the end of the current period (which is also the start of the
-		// new one
-			clock_nanosleep(CLOCK_REALTIME, TIMER_ABSTIME, &next_arrival_time[1], NULL);
-
-		// the thread is ready and can compute the end of the current period for
-		// the next iteration
- 		
-			long int next_arrival_nanoseconds = next_arrival_time[1].tv_nsec + periods[1];
-			next_arrival_time[1].tv_nsec= next_arrival_nanoseconds%1000000000;
-			next_arrival_time[1].tv_sec= next_arrival_time[1].tv_sec + next_arrival_nanoseconds/1000000000;
-    	}
+		// sleep until the end of the current period (which is also the start of the new one)
+		clock_nanosleep(CLOCK_REALTIME, TIMER_ABSTIME, &next_arrival_time[1], NULL);
+		// the thread is ready and can compute the end of the current period for the next iteration
+		long int next_arrival_nanoseconds = next_arrival_time[1].tv_nsec + periods[1];
+		next_arrival_time[1].tv_nsec= next_arrival_nanoseconds%1000000000;
+		next_arrival_time[1].tv_sec= next_arrival_time[1].tv_sec + next_arrival_nanoseconds/1000000000;
+	}
 }
 void task1_code()
 {
-	//print the id of the current task
-  	//printf(" 1[ "); fflush(stdout);
-
 	write_ID_driver("[1");
-	int i,j;
 	double uno;
-  	for (i = 0; i < OUTERLOOP; i++)
-    	{
-      		for (j = 0; j < INNERLOOP; j++)
-			{
-				uno = rand()*rand()%10;
-			}
-    	}
-	//print the id of the current task
-  	//printf(" ]1 "); fflush(stdout);
+  	for (i = 0; i < OUTERLOOP; i++){
+		for (j = 0; j < INNERLOOP; j++) uno = rand()*rand()%10;
+	}
 	write_ID_driver("1]");
 }
 void *task1( void *ptr )
 {
-	// set thread affinity, that is the processor on which threads shall run
 	cpu_set_t cset;
 	CPU_ZERO (&cset);
 	CPU_SET(0, &cset);
 	pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cset);
 
-	int i=0;
-  	for (i=0; i < 100; i++)
-    	{
-      		task1_code();
-
-			clock_nanosleep(CLOCK_REALTIME, TIMER_ABSTIME, &next_arrival_time[0], NULL);
-			long int next_arrival_nanoseconds = next_arrival_time[0].tv_nsec + periods[0];
-			next_arrival_time[0].tv_nsec= next_arrival_nanoseconds%1000000000;
-			next_arrival_time[0].tv_sec= next_arrival_time[0].tv_sec + next_arrival_nanoseconds/1000000000;
-    	}
+  	for (i=0; i < 100; i++){
+		task1_code();
+		clock_nanosleep(CLOCK_REALTIME, TIMER_ABSTIME, &next_arrival_time[0], NULL);
+		long int next_arrival_nanoseconds = next_arrival_time[0].tv_nsec + periods[0];
+		next_arrival_time[0].tv_nsec= next_arrival_nanoseconds%1000000000;
+		next_arrival_time[0].tv_sec= next_arrival_time[0].tv_sec + next_arrival_nanoseconds/1000000000;
+	}
 }
 void task3_code()
 {
-	//print the id of the current task
-  	printf(" 3[ "); fflush(stdout);
-	int i,j;
+	write_ID_driver("[3");
 	double uno;
-  	for (i = 0; i < OUTERLOOP; i++)
-    	{
-      		for (j = 0; j < INNERLOOP; j++);		
-				double uno = rand()*rand()%10;
-    	}
-	//print the id of the current task
-  	printf(" ]3 "); fflush(stdout);
+  	for (i = 0; i < OUTERLOOP; i++){
+		for (j = 0; j < INNERLOOP; j++) uno = rand()*rand()%10;
+	}
+  	write_ID_driver("3]");
 }
 void *task3( void *ptr)
 {
-	// set thread affinity, that is the processor on which threads shall run
 	cpu_set_t cset;
 	CPU_ZERO (&cset);
 	CPU_SET(0, &cset);
 	pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cset);
 
-	int i=0;
-  	for (i=0; i < 100; i++)
-    	{
-      		task3_code();
-
-			clock_nanosleep(CLOCK_REALTIME, TIMER_ABSTIME, &next_arrival_time[2], NULL);
-			long int next_arrival_nanoseconds = next_arrival_time[2].tv_nsec + periods[2];
-			next_arrival_time[2].tv_nsec= next_arrival_nanoseconds%1000000000;
-			next_arrival_time[2].tv_sec= next_arrival_time[2].tv_sec + next_arrival_nanoseconds/1000000000;
+  	for (i=0; i < 100; i++){
+		task3_code();
+		clock_nanosleep(CLOCK_REALTIME, TIMER_ABSTIME, &next_arrival_time[2], NULL);
+		long int next_arrival_nanoseconds = next_arrival_time[2].tv_nsec + periods[2];
+		next_arrival_time[2].tv_nsec= next_arrival_nanoseconds%1000000000;
+		next_arrival_time[2].tv_sec= next_arrival_time[2].tv_sec + next_arrival_nanoseconds/1000000000;
     }
 }
 void task4_code()
 {
-  	printf(" 4[ "); fflush(stdout);
-	for (int i = 0; i < OUTERLOOP; i++)
-    	{
-      		for (int j = 0; j < INNERLOOP; j++)
-				double uno = rand()*rand();
-    	}
-  	printf(" ]4 "); fflush(stdout);
-  	fflush(stdout);
+  	write_ID_driver("[4");
+	for (int i = 0; i < OUTERLOOP; i++){
+		for (int j = 0; j < INNERLOOP; j++) double uno = rand()*rand();	
+	}
+  	write_ID_driver("4]");
 }
 void *task4( void *)
 {
-	// set thread affinity, that is the processor on which threads shall run
 	cpu_set_t cset;
 	CPU_ZERO (&cset);
 	CPU_SET(0, &cset);
-	pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cset);
-
-	//add an infinite loop 
+	pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cset); 
 	while (1)
     	{
 		// wait for the proper condition to be signalled
